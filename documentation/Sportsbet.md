@@ -1,7 +1,7 @@
 # Sportsbet API Documentation
 
-> For a read-only workflow limited to the English Premier League, La Liga, Serie A,
-> Bundesliga, and Ligue 1, see [top-five league market analysis](#top-five-domestic-league-market-analysis).
+> For a read-only workflow covering the top five domestic leagues, UEFA club competitions,
+> and the listed domestic cups, see [soccer market analysis](#soccer-market-analysis).
 
 Unofficial reference for the JSON endpoints served under `www.sportsbet.com.au/apigw/*`. Every endpoint, parameter, and response field in this document has been verified against live traffic (probed 2026-05-25). Field shapes are reproduced from the wire — fields that were not observed are not invented.
 
@@ -2576,31 +2576,41 @@ Legs the book will not combine are refused rather than priced.
 
 ---
 
-### Top-five domestic league market analysis
+### Soccer market analysis
 
-The scope is limited to association-football matches in the English Premier League,
-Spanish La Liga, Italian Serie A, German Bundesliga, and French Ligue 1. It excludes
-UEFA competitions, cups, lower divisions, women's leagues, and other sports. This
-workflow uses only existing public, read-only Sportsbet tools. It does not use the
+The requested scope is association football in these 20 competitions: the English
+Premier League, Spanish La Liga, Italian Serie A, German Bundesliga, French Ligue 1;
+UEFA Champions League, Europa League, Conference League, and Super Cup; English FA Cup,
+EFL Cup, and Community Shield; Spanish Copa del Rey and Supercopa de España; German
+DFB-Pokal and DFL-Supercup; Italian Coppa Italia and Supercoppa Italiana; and French Coupe
+de France and Trophée des Champions. Other sports and competitions are outside the scope.
+
+This workflow uses only the existing public, read-only Sportsbet tools. It does not use
 Sportsbet account or write groups. Do not enable `sportsbet.account` or `sportsbet.write`;
 do not call `sportsbet_place_bet`, `sportsbet_price_slip`, bet history, or any account,
 wallet, or placement operation.
 
 ### Read-only tool sequence
 
-1. Call `sportsbet_nav_hierarchy` and select only the five domestic competitions under
-   the `Soccer` class. `select_top_five_competitions` recognizes the official names
-   returned by the current navigation and keeps the competition's internal `id` for
-   `sportsbet_competition_matches`. Do not hard-code competition IDs across seasons.
+1. Call `sportsbet_nav_hierarchy` and pass its response to
+   `select_target_football_competitions`. The selector recognizes known name variants only
+   beneath the Soccer/Football class, deduplicates repeated navigation rows, and returns
+   the IDs exposed by the current response. A requested competition absent from the live
+   navigation is unavailable for that run; do not guess an ID or use an ID from an older
+   season. `select_top_five_competitions` remains available for consumers that need only
+   the five domestic leagues.
 2. Call `sportsbet_competition_matches` once for each selected competition. Convert each
    event's Unix `startTime` to `Australia/Brisbane`, then keep events whose local date is
-   the target date. Do not infer the local date from a European calendar label alone.
+   the target date. Do not infer the Brisbane date from a European fixture label alone.
 3. Call `sportsbet_event_markets` once for each confirmed matching event. Preserve the complete
    response, including market and selection `statusCode`, every selection, and every
    `price.winPrice` decimal quote. Record an aware retrieval timestamp immediately
    around each tool call, the endpoint/event ID, response status, and any error.
-4. Call `sportsbet_event_status` for each event if a live/suspended/settled event-level
-   flag is needed. Market and selection status still come from the markets response.
+4. Call the read-only `sportsbet_event_status` endpoint for each confirmed event when an
+   event-level preview/in-play/settled flag is useful. Keep it alongside the market
+   payload: if event status conflicts with the scheduled kickoff or market statuses,
+   report the conflict and treat price freshness as uncertain. Market and selection
+   status still come from the markets response.
 5. Run the offline analyser on the saved response files. The analyser does not access
    the network or alter the raw files:
 
@@ -2612,16 +2622,30 @@ wallet, or placement operation.
 A single saved markets array can also be analysed with
 `--retrieved-at "2026-10-13T01:07:02+10:00"`.
 
-#### Fixture audit for 14 October 2026
+#### Fixture and market audit for 14 October 2026
 
-In the snapshot retrieved on 13 October 2026 from 02:01:51 to 02:01:52 AEST, the
-Sportsbet navigation and each of the five competition-match GET endpoints returned
-HTTP 200. The feeds returned no events whose kickoff instant fell on 14 October in
-`Australia/Brisbane`. Therefore no event-market request was made for that date: the
-snapshot contains zero retrieved markets and zero priced selections. This is an observed
-feed result, not an assumed fixture list or an inferred price. The raw navigation, five
-competition responses, and per-request UTC retrieval timestamps are preserved in the
-[`sportsbet-top-five-2026-10-14-raw`](../data/audits/sportsbet-top-five-2026-10-14-raw/) run snapshot, with the [audit report](audits/sportsbet-top-five-2026-10-14.md).
+The expanded run retrieved the navigation on 13 October 2026 at 02:52 AEST, then queried
+the 11 competitions present in that response. Their match feeds returned HTTP 200, and
+the event timestamps identified nine UEFA Champions League fixtures on 14 October in
+`Australia/Brisbane`. UEFA's official Matchday 2 list independently confirms those games
+on 13 October in Europe; the displayed European evening kick-offs convert to the next
+calendar date in Brisbane. No other selected competition returned a fixture for the
+requested Brisbane date.
+
+The nine matching events each had a successful markets request. Their full market and
+selection counts, raw decimal prices, statuses, implied probabilities, de-vigged 1X2
+probabilities, request timestamps, unavailable competitions, and external comparison
+limits are in the [expanded run audit](audits/sportsbet-all-football-2026-10-14.md).
+Raw responses and the request manifest are preserved under
+[`sportsbet-all-football-2026-10-14-rerun`](../data/audits/sportsbet-all-football-2026-10-14-rerun/).
+
+All nine market snapshots were retrieved on 12 October UTC, before their scheduled
+13 October UTC kick-offs (14 October in Brisbane), and each event-status response said
+`preview`. The analyser records whether each market request was before or after the
+scheduled start and flags a `preview` status that conflicts with a post-kickoff snapshot.
+For all nine matches, the markets payload had no per-price update timestamp. The
+analyser's “fresh” label measures only the age of the response snapshot, not when a
+bookmaker last changed each price.
 
 The directory form expects `manifest.json` with an `events` array. A successful entry
 contains `eventId`, `endpoint`, `httpStatus: 200`, `retrievedAt`, and `rawFile`. Record
@@ -2665,9 +2689,9 @@ events and filters on the actual kickoff instant:
 
 ```python
 from sportsdata_mcp.market_analysis import filter_events_for_local_date
-from sportsdata_mcp.market_analysis import select_top_five_competitions
+from sportsdata_mcp.market_analysis import select_target_football_competitions
 
-competitions = select_top_five_competitions(nav_hierarchy_response)
+competitions = select_target_football_competitions(nav_hierarchy_response)
 matches = [
     event
     for competition in competitions

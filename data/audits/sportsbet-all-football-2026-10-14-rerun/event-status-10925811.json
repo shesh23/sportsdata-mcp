@@ -1,0 +1,193 @@
+{
+    "license": "Copyright 2026 GTG Network. All rights reserved.",
+    "statusCode": 200,
+    "eventID": "10925811",
+    "eventStatus": "preview",
+    "content": [
+        {
+            "page": "Preview/Review",
+            "resources": [
+                {
+                    "device": "iOS",
+                    "url": "https://sbios.isportgenius.com.au/10925811"
+                },
+                {
+                    "device": "Android",
+                    "url": "https://sband.isportgenius.com.au/10925811"
+                },
+                {
+                    "device": "Mobile",
+                    "url": "https://sbmob.isportgenius.com.au/10925811"
+                },
+                {
+                    "device": "Desktop",
+                    "url": "https://sblr-desktop.isportgenius.com.au/10925811"
+                },
+                {
+                    "device": "Mweb",
+                    "url": "https://sblr-mweb.isportgenius.com.au/10925811"
+                },
+                {
+                    "device": "iOSv2",
+                    "url": "https://sbios.isportgenius.com.au/10925811?v=iosv2"
+                }
+            ]
+        },
+        {
+            "page": "Betting Insights",
+            "resources": [
+                {
+                    "device": "iOS",
+                    "url": "https://sbios.isportgenius.com.au/betting-insights/10925811"
+                },
+                {
+                    "device": "Android",
+                    "url": "https://sband.isportgenius.com.au/betting-insights/10925811"
+                },
+                {
+                    "device": "Mobile",
+                    "url": "https://sbmob.isportgenius.com.au/betting-insights/10925811"
+                },
+                {
+                    "device": "Desktop",
+                    "url": "https://sblr-desktop.isportgenius.com.au/betting-insights/10925811"
+                },
+                {
+                    "device": "Mweb",
+                    "url": "https://sblr-mweb.isportgenius.com.au/betting-insights/10925811"
+                },
+                {
+                    "device": "iOSv2",
+                    "url": "https://sbios.isportgenius.com.au/betting-insights/10925811?v=iosv2"
+                }
+            ]
+        },
+        {
+            "page": "Stats",
+            "resources": [
+                {
+                    "device": "iOS",
+                    "url": "https://sbios.isportgenius.com.au/stats/10925811"
+                },
+                {
+                    "device": "Android",
+                    "url": "https://sband.isportgenius.com.au/stats/10925811"
+                },
+                {
+                    "device": "Mobile",
+                    "url": "https://sbmob.isportgenius.com.au/stats/10925811"
+                },
+                {
+                    "device": "Desktop",
+                    "url": "https://sblr-desktop.isportgenius.com.au/stats/10925811"
+                },
+                {
+                    "device": "Mweb",
+                    "url": "https://sblr-mweb.isportgenius.com.au/stats/10925811"
+                },
+                {
+                    "device": "iOSv2",
+                    "url": "https://sbios.isportgenius.com.au/stats/10925811?v=iosv2"
+                }
+            ]
+        },
+        {
+            "page": "Ladder",
+            "resources": [
+                {
+                    "device": "iOS",
+                    "url": "https://sbios.isportgenius.com.au/ladder/10925811"
+                },
+                {
+                    "device": "Android",
+                    "url": "https://sband.isportgenius.com.au/ladder/10925811"
+                },
+                {
+                    "device": "Mobile",
+                    "url": "https://sbmob.isportgenius.com.au/ladder/10925811"
+                },
+                {
+                    "device": "Desktop",
+                    "url": "https://sblr-desktop.isportgenius.com.au/ladder/10925811"
+                },
+                {
+                    "device": "Mweb",
+                    "url": "https://sblr-mweb.isportgenius.com.au/ladder/10925811"
+                },
+                {
+                    "device": "iOSv2",
+                    "url": "https://sbios.isportgenius.com.au/ladder/10925811?v=iosv2"
+                }
+            ]
+        },
+        {
+            "funfacts": [
+                {
+                    "market_group_isgapi_id": "h2h",
+                    "fact": "The favourite has won each of RB Leipzig's last 10 Champions League Tuesday matches.",
+                    "tag": [
+                        "RB Leipzig",
+                        "PSV",
+                        "favwon"
+                    ],
+                    "is_funfacts_tips": true,
+                    "target_bet": {
+                        "result": "RB Leipzig",
+                        "market": "Win-Draw-Win",
+                        "market_id": "253582452",
+                        "outcomeid": "1252737098",
+                        "icon": "https://cdn.gtgnetwork.com/icons/teams/soccer/sportsbet/rb_leipzig.png",
+                        "price": 1.74,
+                        "price_american": "-136",
+                        "market_isg_api_id": "win",
+                        "market_key": "T1584-4001"
+                    },
+                    "fact_type": "preview"
+                },
+                {
+                    "market_group_isgapi_id": "total",
+                    "fact": "The 'Over 3.5 Goals' market has hit in four of PSV's last five Champions League Tuesday matches.",
+                    "tag": [
+                        "RB Leipzig",
+                        "PSV",
+                        "over"
+                    ],
+                    "target_bet": {
+                        "result": "Over 3.5 Goals",
+                        "market": "Over/Under 3.5 Goals",
+                        "market_id": "253582585",
+                        "outcomeid": "1252737986",
+                        "icon": "https://cdn.gtgnetwork.com/icons/sports/sportsbet/soccer_icon.png",
+                        "price": 1.75,
+                        "price_american": "-134",
+                        "total": 3.5,
+                        "market_isg_api_id": "over,3.5",
+                        "market_key": "0-6408"
+                    },
+                    "fact_type": "preview"
+                },
+                {
+                    "market_group_isgapi_id": "btts",
+                    "fact": "The 'Both Teams to Score' market has hit in 14 of PSV's last 15 Champions League matches.",
+                    "tag": [
+                        "RB Leipzig",
+                        "PSV",
+                        "bsts"
+                    ],
+                    "target_bet": {
+                        "result": "Yes",
+                        "market": "Both Teams To Score",
+                        "market_id": "253582563",
+                        "outcomeid": "1252737744",
+                        "icon": "https://cdn.gtgnetwork.com/icons/sports/sportsbet/soccer_icon.png",
+                        "price": 1.33,
+                        "price_american": "-305",
+                        "market_isg_api_id": "bsts-em",
+                        "market_key": "0-2002"
+                    },
+                    "fact_type": "preview"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,171 @@
+{
+    "license": "Copyright 2026 GTG Network. All rights reserved.",
+    "statusCode": 200,
+    "eventID": "10925844",
+    "eventStatus": "preview",
+    "content": [
+        {
+            "page": "Preview/Review",
+            "resources": [
+                {
+                    "device": "iOS",
+                    "url": "https://sbios.isportgenius.com.au/10925844"
+                },
+                {
+                    "device": "Android",
+                    "url": "https://sband.isportgenius.com.au/10925844"
+                },
+                {
+                    "device": "Mobile",
+                    "url": "https://sbmob.isportgenius.com.au/10925844"
+                },
+                {
+                    "device": "Desktop",
+                    "url": "https://sblr-desktop.isportgenius.com.au/10925844"
+                },
+                {
+                    "device": "Mweb",
+                    "url": "https://sblr-mweb.isportgenius.com.au/10925844"
+                },
+                {
+                    "device": "iOSv2",
+                    "url": "https://sbios.isportgenius.com.au/10925844?v=iosv2"
+                }
+            ]
+        },
+        {
+            "page": "Betting Insights",
+            "resources": [
+                {
+                    "device": "iOS",
+                    "url": "https://sbios.isportgenius.com.au/betting-insights/10925844"
+                },
+                {
+                    "device": "Android",
+                    "url": "https://sband.isportgenius.com.au/betting-insights/10925844"
+                },
+                {
+                    "device": "Mobile",
+                    "url": "https://sbmob.isportgenius.com.au/betting-insights/10925844"
+                },
+                {
+                    "device": "Desktop",
+                    "url": "https://sblr-desktop.isportgenius.com.au/betting-insights/10925844"
+                },
+                {
+                    "device": "Mweb",
+                    "url": "https://sblr-mweb.isportgenius.com.au/betting-insights/10925844"
+                },
+                {
+                    "device": "iOSv2",
+                    "url": "https://sbios.isportgenius.com.au/betting-insights/10925844?v=iosv2"
+                }
+            ]
+        },
+        {
+            "page": "Stats",
+            "resources": [
+                {
+                    "device": "iOS",
+                    "url": "https://sbios.isportgenius.com.au/stats/10925844"
+                },
+                {
+                    "device": "Android",
+                    "url": "https://sband.isportgenius.com.au/stats/10925844"
+                },
+                {
+                    "device": "Mobile",
+                    "url": "https://sbmob.isportgenius.com.au/stats/10925844"
+                },
+                {
+                    "device": "Desktop",
+                    "url": "https://sblr-desktop.isportgenius.com.au/stats/10925844"
+                },
+                {
+                    "device": "Mweb",
+                    "url": "https://sblr-mweb.isportgenius.com.au/stats/10925844"
+                },
+                {
+                    "device": "iOSv2",
+                    "url": "https://sbios.isportgenius.com.au/stats/10925844?v=iosv2"
+                }
+            ]
+        },
+        {
+            "page": "Ladder",
+            "resources": [
+                {
+                    "device": "iOS",
+                    "url": "https://sbios.isportgenius.com.au/ladder/10925844"
+                },
+                {
+                    "device": "Android",
+                    "url": "https://sband.isportgenius.com.au/ladder/10925844"
+                },
+                {
+                    "device": "Mobile",
+                    "url": "https://sbmob.isportgenius.com.au/ladder/10925844"
+                },
+                {
+                    "device": "Desktop",
+                    "url": "https://sblr-desktop.isportgenius.com.au/ladder/10925844"
+                },
+                {
+                    "device": "Mweb",
+                    "url": "https://sblr-mweb.isportgenius.com.au/ladder/10925844"
+                },
+                {
+                    "device": "iOSv2",
+                    "url": "https://sbios.isportgenius.com.au/ladder/10925844?v=iosv2"
+                }
+            ]
+        },
+        {
+            "funfacts": [
+                {
+                    "market_group_isgapi_id": "h2h",
+                    "fact": "Arsenal has won each of its last 13 Champions League League Phase matches.",
+                    "tag": [
+                        "Arsenal",
+                        "Lille",
+                        "won"
+                    ],
+                    "target_bet": {
+                        "result": "Arsenal",
+                        "market": "Win-Draw-Win",
+                        "market_id": "253585690",
+                        "outcomeid": "1252755301",
+                        "icon": "https://cdn.gtgnetwork.com/icons/teams/soccer/sportsbet/arsenal.png",
+                        "price": 1.21,
+                        "price_american": "-480",
+                        "market_isg_api_id": "win",
+                        "market_key": "T1324-4001"
+                    },
+                    "fact_type": "preview"
+                },
+                {
+                    "market_group_isgapi_id": "btts",
+                    "fact": "The 'Both Teams to Score' market has hit in each of Lille's last nine Champions League matches.",
+                    "tag": [
+                        "Arsenal",
+                        "Lille",
+                        "bsts"
+                    ],
+                    "is_funfacts_tips": true,
+                    "target_bet": {
+                        "result": "Yes",
+                        "market": "Both Teams To Score",
+                        "market_id": "253585765",
+                        "outcomeid": "1252755603",
+                        "icon": "https://cdn.gtgnetwork.com/icons/sports/sportsbet/soccer_icon.png",
+                        "price": 2,
+                        "price_american": "+100",
+                        "market_isg_api_id": "bsts-em",
+                        "market_key": "0-2002"
+                    },
+                    "fact_type": "preview"
+                }
+            ]
+        }
+    ]
+}

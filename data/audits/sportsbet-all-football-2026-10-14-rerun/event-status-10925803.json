@@ -1,0 +1,193 @@
+{
+    "license": "Copyright 2026 GTG Network. All rights reserved.",
+    "statusCode": 200,
+    "eventID": "10925803",
+    "eventStatus": "preview",
+    "content": [
+        {
+            "page": "Preview/Review",
+            "resources": [
+                {
+                    "device": "iOS",
+                    "url": "https://sbios.isportgenius.com.au/10925803"
+                },
+                {
+                    "device": "Android",
+                    "url": "https://sband.isportgenius.com.au/10925803"
+                },
+                {
+                    "device": "Mobile",
+                    "url": "https://sbmob.isportgenius.com.au/10925803"
+                },
+                {
+                    "device": "Desktop",
+                    "url": "https://sblr-desktop.isportgenius.com.au/10925803"
+                },
+                {
+                    "device": "Mweb",
+                    "url": "https://sblr-mweb.isportgenius.com.au/10925803"
+                },
+                {
+                    "device": "iOSv2",
+                    "url": "https://sbios.isportgenius.com.au/10925803?v=iosv2"
+                }
+            ]
+        },
+        {
+            "page": "Betting Insights",
+            "resources": [
+                {
+                    "device": "iOS",
+                    "url": "https://sbios.isportgenius.com.au/betting-insights/10925803"
+                },
+                {
+                    "device": "Android",
+                    "url": "https://sband.isportgenius.com.au/betting-insights/10925803"
+                },
+                {
+                    "device": "Mobile",
+                    "url": "https://sbmob.isportgenius.com.au/betting-insights/10925803"
+                },
+                {
+                    "device": "Desktop",
+                    "url": "https://sblr-desktop.isportgenius.com.au/betting-insights/10925803"
+                },
+                {
+                    "device": "Mweb",
+                    "url": "https://sblr-mweb.isportgenius.com.au/betting-insights/10925803"
+                },
+                {
+                    "device": "iOSv2",
+                    "url": "https://sbios.isportgenius.com.au/betting-insights/10925803?v=iosv2"
+                }
+            ]
+        },
+        {
+            "page": "Stats",
+            "resources": [
+                {
+                    "device": "iOS",
+                    "url": "https://sbios.isportgenius.com.au/stats/10925803"
+                },
+                {
+                    "device": "Android",
+                    "url": "https://sband.isportgenius.com.au/stats/10925803"
+                },
+                {
+                    "device": "Mobile",
+                    "url": "https://sbmob.isportgenius.com.au/stats/10925803"
+                },
+                {
+                    "device": "Desktop",
+                    "url": "https://sblr-desktop.isportgenius.com.au/stats/10925803"
+                },
+                {
+                    "device": "Mweb",
+                    "url": "https://sblr-mweb.isportgenius.com.au/stats/10925803"
+                },
+                {
+                    "device": "iOSv2",
+                    "url": "https://sbios.isportgenius.com.au/stats/10925803?v=iosv2"
+                }
+            ]
+        },
+        {
+            "page": "Ladder",
+            "resources": [
+                {
+                    "device": "iOS",
+                    "url": "https://sbios.isportgenius.com.au/ladder/10925803"
+                },
+                {
+                    "device": "Android",
+                    "url": "https://sband.isportgenius.com.au/ladder/10925803"
+                },
+                {
+                    "device": "Mobile",
+                    "url": "https://sbmob.isportgenius.com.au/ladder/10925803"
+                },
+                {
+                    "device": "Desktop",
+                    "url": "https://sblr-desktop.isportgenius.com.au/ladder/10925803"
+                },
+                {
+                    "device": "Mweb",
+                    "url": "https://sblr-mweb.isportgenius.com.au/ladder/10925803"
+                },
+                {
+                    "device": "iOSv2",
+                    "url": "https://sbios.isportgenius.com.au/ladder/10925803?v=iosv2"
+                }
+            ]
+        },
+        {
+            "funfacts": [
+                {
+                    "market_group_isgapi_id": "h2h",
+                    "fact": "Slavia Prague has lost each of its last four Champions League matches.",
+                    "tag": [
+                        "Sabah FK",
+                        "Slavia Prague",
+                        "lost"
+                    ],
+                    "is_funfacts_tips": true,
+                    "target_bet": {
+                        "result": "Sabah FK",
+                        "market": "Win-Draw-Win",
+                        "market_id": "253581448",
+                        "outcomeid": "1252731931",
+                        "icon": "https://cdn.gtgnetwork.com/icons/teams/soccer/sportsbet/sabah_fk.png",
+                        "price": 3.5,
+                        "price_american": "+250",
+                        "market_isg_api_id": "loss",
+                        "market_key": "T6467-4002"
+                    },
+                    "fact_type": "preview"
+                },
+                {
+                    "market_group_isgapi_id": "total",
+                    "fact": "The 'Over 2.5 Goals' market has hit in each of Slavia Prague's last four Champions League matches.",
+                    "tag": [
+                        "Sabah FK",
+                        "Slavia Prague",
+                        "over"
+                    ],
+                    "target_bet": {
+                        "result": "Over 2.5 Goals",
+                        "market": "Over/Under 2.5 Goals",
+                        "market_id": "253581541",
+                        "outcomeid": "1252732218",
+                        "icon": "https://cdn.gtgnetwork.com/icons/sports/sportsbet/soccer_icon.png",
+                        "price": 1.59,
+                        "price_american": "-169",
+                        "total": 2.5,
+                        "market_isg_api_id": "over,2.5",
+                        "market_key": "0-6406"
+                    },
+                    "fact_type": "preview"
+                },
+                {
+                    "market_group_isgapi_id": "btts",
+                    "fact": "The 'Both Teams to Score' market has failed to hit in each of Slavia Prague's last four Champions League Tuesday matches.",
+                    "tag": [
+                        "Sabah FK",
+                        "Slavia Prague",
+                        "failtobsts"
+                    ],
+                    "target_bet": {
+                        "result": "No",
+                        "market": "Both Teams To Score",
+                        "market_id": "253581501",
+                        "outcomeid": "1252732097",
+                        "icon": "https://cdn.gtgnetwork.com/icons/sports/sportsbet/soccer_icon.png",
+                        "price": 2.5,
+                        "price_american": "+150",
+                        "market_isg_api_id": "bsts-em,no",
+                        "market_key": "0-5422"
+                    },
+                    "fact_type": "preview"
+                }
+            ]
+        }
+    ]
+}

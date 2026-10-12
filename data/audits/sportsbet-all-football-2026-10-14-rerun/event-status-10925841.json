@@ -1,0 +1,193 @@
+{
+    "license": "Copyright 2026 GTG Network. All rights reserved.",
+    "statusCode": 200,
+    "eventID": "10925841",
+    "eventStatus": "preview",
+    "content": [
+        {
+            "page": "Preview/Review",
+            "resources": [
+                {
+                    "device": "iOS",
+                    "url": "https://sbios.isportgenius.com.au/10925841"
+                },
+                {
+                    "device": "Android",
+                    "url": "https://sband.isportgenius.com.au/10925841"
+                },
+                {
+                    "device": "Mobile",
+                    "url": "https://sbmob.isportgenius.com.au/10925841"
+                },
+                {
+                    "device": "Desktop",
+                    "url": "https://sblr-desktop.isportgenius.com.au/10925841"
+                },
+                {
+                    "device": "Mweb",
+                    "url": "https://sblr-mweb.isportgenius.com.au/10925841"
+                },
+                {
+                    "device": "iOSv2",
+                    "url": "https://sbios.isportgenius.com.au/10925841?v=iosv2"
+                }
+            ]
+        },
+        {
+            "page": "Betting Insights",
+            "resources": [
+                {
+                    "device": "iOS",
+                    "url": "https://sbios.isportgenius.com.au/betting-insights/10925841"
+                },
+                {
+                    "device": "Android",
+                    "url": "https://sband.isportgenius.com.au/betting-insights/10925841"
+                },
+                {
+                    "device": "Mobile",
+                    "url": "https://sbmob.isportgenius.com.au/betting-insights/10925841"
+                },
+                {
+                    "device": "Desktop",
+                    "url": "https://sblr-desktop.isportgenius.com.au/betting-insights/10925841"
+                },
+                {
+                    "device": "Mweb",
+                    "url": "https://sblr-mweb.isportgenius.com.au/betting-insights/10925841"
+                },
+                {
+                    "device": "iOSv2",
+                    "url": "https://sbios.isportgenius.com.au/betting-insights/10925841?v=iosv2"
+                }
+            ]
+        },
+        {
+            "page": "Stats",
+            "resources": [
+                {
+                    "device": "iOS",
+                    "url": "https://sbios.isportgenius.com.au/stats/10925841"
+                },
+                {
+                    "device": "Android",
+                    "url": "https://sband.isportgenius.com.au/stats/10925841"
+                },
+                {
+                    "device": "Mobile",
+                    "url": "https://sbmob.isportgenius.com.au/stats/10925841"
+                },
+                {
+                    "device": "Desktop",
+                    "url": "https://sblr-desktop.isportgenius.com.au/stats/10925841"
+                },
+                {
+                    "device": "Mweb",
+                    "url": "https://sblr-mweb.isportgenius.com.au/stats/10925841"
+                },
+                {
+                    "device": "iOSv2",
+                    "url": "https://sbios.isportgenius.com.au/stats/10925841?v=iosv2"
+                }
+            ]
+        },
+        {
+            "page": "Ladder",
+            "resources": [
+                {
+                    "device": "iOS",
+                    "url": "https://sbios.isportgenius.com.au/ladder/10925841"
+                },
+                {
+                    "device": "Android",
+                    "url": "https://sband.isportgenius.com.au/ladder/10925841"
+                },
+                {
+                    "device": "Mobile",
+                    "url": "https://sbmob.isportgenius.com.au/ladder/10925841"
+                },
+                {
+                    "device": "Desktop",
+                    "url": "https://sblr-desktop.isportgenius.com.au/ladder/10925841"
+                },
+                {
+                    "device": "Mweb",
+                    "url": "https://sblr-mweb.isportgenius.com.au/ladder/10925841"
+                },
+                {
+                    "device": "iOSv2",
+                    "url": "https://sbios.isportgenius.com.au/ladder/10925841?v=iosv2"
+                }
+            ]
+        },
+        {
+            "funfacts": [
+                {
+                    "market_group_isgapi_id": "h2h",
+                    "fact": "The home team has won each of Galatasaray's last six Champions League matches.",
+                    "tag": [
+                        "Galatasaray",
+                        "Barcelona",
+                        "homewon"
+                    ],
+                    "is_funfacts_tips": true,
+                    "target_bet": {
+                        "result": "Galatasaray",
+                        "market": "Win-Draw-Win",
+                        "market_id": "253585446",
+                        "outcomeid": "1252753994",
+                        "icon": "https://cdn.gtgnetwork.com/icons/teams/soccer/sportsbet/galatasaray.png",
+                        "price": 8.75,
+                        "price_american": "+775",
+                        "market_isg_api_id": "win",
+                        "market_key": "T1765-4001"
+                    },
+                    "fact_type": "preview"
+                },
+                {
+                    "market_group_isgapi_id": "total",
+                    "fact": "The 'Over 2.5 Goals' market has hit in each of Barcelona's last 17 Champions League League Phase matches.",
+                    "tag": [
+                        "Galatasaray",
+                        "Barcelona",
+                        "over"
+                    ],
+                    "target_bet": {
+                        "result": "Over 2.5 Goals",
+                        "market": "Over/Under 2.5 Goals",
+                        "market_id": "253585542",
+                        "outcomeid": "1252754525",
+                        "icon": "https://cdn.gtgnetwork.com/icons/sports/sportsbet/soccer_icon.png",
+                        "price": 1.17,
+                        "price_american": "-590",
+                        "total": 2.5,
+                        "market_isg_api_id": "over,2.5",
+                        "market_key": "0-6406"
+                    },
+                    "fact_type": "preview"
+                },
+                {
+                    "market_group_isgapi_id": "btts",
+                    "fact": "The 'Both Teams to Score' market has hit in 11 of Barcelona's last 12 Champions League League Phase matches.",
+                    "tag": [
+                        "Galatasaray",
+                        "Barcelona",
+                        "bsts"
+                    ],
+                    "target_bet": {
+                        "result": "Yes",
+                        "market": "Both Teams To Score",
+                        "market_id": "253585487",
+                        "outcomeid": "1252754192",
+                        "icon": "https://cdn.gtgnetwork.com/icons/sports/sportsbet/soccer_icon.png",
+                        "price": 1.4,
+                        "price_american": "-250",
+                        "market_isg_api_id": "bsts-em",
+                        "market_key": "0-2002"
+                    },
+                    "fact_type": "preview"
+                }
+            ]
+        }
+    ]
+}

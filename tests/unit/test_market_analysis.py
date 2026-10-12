@@ -6,11 +6,13 @@ from datetime import UTC, datetime
 import pytest
 
 from sportsdata_mcp.market_analysis import (
+    TARGET_FOOTBALL_COMPETITIONS,
     TOP_FIVE_LEAGUES,
     analyse_markets,
     analyse_snapshot_directory,
     decimal_implied_probability,
     filter_events_for_local_date,
+    select_target_football_competitions,
     select_top_five_competitions,
     snapshot_freshness,
 )
@@ -202,6 +204,104 @@ def test_top_five_competition_selection_requires_a_soccer_navigation_node():
         select_top_five_competitions({"navItems": [{"name": "Basketball", "navItems": []}]})
 
 
+def test_target_competition_selection_includes_all_requested_leagues_and_cups():
+    names = [
+        "English Premier League",
+        "Spanish La Liga",
+        "Italian Serie A",
+        "German Bundesliga",
+        "French Ligue 1",
+        "UEFA Champions League",
+        "UEFA Europa League",
+        "UEFA Conference League",
+        "UEFA Super Cup",
+        "English FA Cup",
+        "English Football League Cup",
+        "FA Community Shield",
+        "Spanish Copa del Rey",
+        "Spanish Supercopa de España",
+        "German DFB Pokal",
+        "German DFL-Supercup",
+        "Italian Coppa Italia",
+        "Italian Supercoppa Italiana",
+        "French Coupe de France",
+        "French Trophée des Champions",
+    ]
+    payload = {
+        "navItems": [
+            {
+                "idType": "class",
+                "name": "Soccer",
+                "navItems": [
+                    {"name": "European competitions", "navItems": [
+                        {"idType": "competition", "id": index, "name": name}
+                        for index, name in enumerate(names, start=100)
+                    ]},
+                    # Duplicate live navigation rows should still select one competition.
+                    {"idType": "competition", "id": 100, "name": "UEFA Champions League"},
+                ],
+            },
+            {
+                "idType": "class",
+                "name": "Basketball",
+                "navItems": [{"idType": "competition", "id": 999, "name": "UEFA Champions League"}],
+            },
+        ]
+    }
+
+    competitions = select_target_football_competitions(payload)
+
+    assert tuple(row["competition"] for row in competitions) == TARGET_FOOTBALL_COMPETITIONS
+    assert len(competitions) == 20
+    assert competitions[-1]["competitionName"] == "French Trophée des Champions"
+    assert [row["competitionId"] for row in competitions] == list(range(100, 120))
+
+
+def test_target_competition_selection_returns_only_currently_available_names():
+    payload = {
+        "navItems": [
+            {
+                "idType": "class",
+                "name": "Soccer",
+                "navItems": [
+                    {"idType": "competition", "id": 727, "name": "UEFA Champions League"},
+                    {"idType": "competition", "id": 726, "name": "English FA Cup"},
+                ],
+            }
+        ]
+    }
+
+    competitions = select_target_football_competitions(payload)
+
+    assert [(row["competition"], row["competitionId"]) for row in competitions] == [
+        ("UEFA Champions League", 727),
+        ("English FA Cup", 726),
+    ]
+
+
+def test_target_competition_name_matching_folds_accents_and_punctuation():
+    payload = {
+        "nav": [
+            {
+                "name": "Soccer",
+                "competitions": [
+                    {"competitionId": "1", "name": "Spanish Supercopa de Espana"},
+                    {"competitionId": "2", "name": "French Trophee des Champions"},
+                    {"competitionId": "3", "name": "German DFL-Supercup"},
+                ],
+            }
+        ]
+    }
+
+    competitions = select_target_football_competitions(payload)
+
+    assert [row["competition"] for row in competitions] == [
+        "Spanish Supercopa de España",
+        "German DFL-Supercup",
+        "French Trophée des Champions",
+    ]
+
+
 def test_documented_sportsbet_workflow_contains_only_anonymous_get_tools():
     spec = next(spec for spec in load_all_specs() if spec.provider.id == "sportsbet")
     tools = {
@@ -230,6 +330,8 @@ def test_documented_sportsbet_workflow_contains_only_anonymous_get_tools():
 def test_snapshot_directory_retains_failed_market_requests(tmp_path):
     manifest = {
         "provider": "Sportsbet",
+        "requestedLocalDate": "2026-10-14",
+        "timezone": "Australia/Brisbane",
         "events": [
             {
                 "eventId": "broken",
@@ -246,4 +348,43 @@ def test_snapshot_directory_retains_failed_market_requests(tmp_path):
 
     assert result["events"][0]["httpStatus"] == 503
     assert result["events"][0]["requestError"] == "upstream unavailable"
+    assert result["fixtureDate"] == "2026-10-14"
+    assert result["fixtureTimezone"] == "Australia/Brisbane"
     assert "analysis" not in result["events"][0]
+
+
+def test_snapshot_directory_flags_post_kickoff_prices_and_event_status_conflict(tmp_path):
+    kickoff = datetime(2026, 10, 13, 16, 45, tzinfo=UTC).timestamp()
+    (tmp_path / "markets.json").write_text("[]", encoding="utf-8")
+    (tmp_path / "status.json").write_text(json.dumps({"eventStatus": "preview"}), encoding="utf-8")
+    manifest = {
+        "requestedLocalDate": "2026-10-14",
+        "timezone": "Australia/Brisbane",
+        "events": [
+            {
+                "eventId": "event-1",
+                "eventName": "Example v Match",
+                "competition": "UEFA Champions League",
+                "httpStatus": 200,
+                "retrievedAt": "2026-10-13T16:53:40+00:00",
+                "scheduledStartTime": kickoff,
+                "rawFile": "markets.json",
+            }
+        ],
+        "eventStatuses": [
+            {
+                "eventId": "event-1",
+                "httpStatus": 200,
+                "retrievedAt": "2026-10-13T16:54:00+00:00",
+                "rawFile": "status.json",
+            }
+        ],
+    }
+    (tmp_path / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+
+    result = analyse_snapshot_directory(tmp_path)
+
+    event = result["events"][0]
+    assert event["retrievalTiming"]["status"] == "after-scheduled-kickoff"
+    assert event["eventStatus"] == "preview"
+    assert event["eventStatusConflict"] is True

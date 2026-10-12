@@ -1,0 +1,193 @@
+{
+    "license": "Copyright 2026 GTG Network. All rights reserved.",
+    "statusCode": 200,
+    "eventID": "10925825",
+    "eventStatus": "preview",
+    "content": [
+        {
+            "page": "Preview/Review",
+            "resources": [
+                {
+                    "device": "iOS",
+                    "url": "https://sbios.isportgenius.com.au/10925825"
+                },
+                {
+                    "device": "Android",
+                    "url": "https://sband.isportgenius.com.au/10925825"
+                },
+                {
+                    "device": "Mobile",
+                    "url": "https://sbmob.isportgenius.com.au/10925825"
+                },
+                {
+                    "device": "Desktop",
+                    "url": "https://sblr-desktop.isportgenius.com.au/10925825"
+                },
+                {
+                    "device": "Mweb",
+                    "url": "https://sblr-mweb.isportgenius.com.au/10925825"
+                },
+                {
+                    "device": "iOSv2",
+                    "url": "https://sbios.isportgenius.com.au/10925825?v=iosv2"
+                }
+            ]
+        },
+        {
+            "page": "Betting Insights",
+            "resources": [
+                {
+                    "device": "iOS",
+                    "url": "https://sbios.isportgenius.com.au/betting-insights/10925825"
+                },
+                {
+                    "device": "Android",
+                    "url": "https://sband.isportgenius.com.au/betting-insights/10925825"
+                },
+                {
+                    "device": "Mobile",
+                    "url": "https://sbmob.isportgenius.com.au/betting-insights/10925825"
+                },
+                {
+                    "device": "Desktop",
+                    "url": "https://sblr-desktop.isportgenius.com.au/betting-insights/10925825"
+                },
+                {
+                    "device": "Mweb",
+                    "url": "https://sblr-mweb.isportgenius.com.au/betting-insights/10925825"
+                },
+                {
+                    "device": "iOSv2",
+                    "url": "https://sbios.isportgenius.com.au/betting-insights/10925825?v=iosv2"
+                }
+            ]
+        },
+        {
+            "page": "Stats",
+            "resources": [
+                {
+                    "device": "iOS",
+                    "url": "https://sbios.isportgenius.com.au/stats/10925825"
+                },
+                {
+                    "device": "Android",
+                    "url": "https://sband.isportgenius.com.au/stats/10925825"
+                },
+                {
+                    "device": "Mobile",
+                    "url": "https://sbmob.isportgenius.com.au/stats/10925825"
+                },
+                {
+                    "device": "Desktop",
+                    "url": "https://sblr-desktop.isportgenius.com.au/stats/10925825"
+                },
+                {
+                    "device": "Mweb",
+                    "url": "https://sblr-mweb.isportgenius.com.au/stats/10925825"
+                },
+                {
+                    "device": "iOSv2",
+                    "url": "https://sbios.isportgenius.com.au/stats/10925825?v=iosv2"
+                }
+            ]
+        },
+        {
+            "page": "Ladder",
+            "resources": [
+                {
+                    "device": "iOS",
+                    "url": "https://sbios.isportgenius.com.au/ladder/10925825"
+                },
+                {
+                    "device": "Android",
+                    "url": "https://sband.isportgenius.com.au/ladder/10925825"
+                },
+                {
+                    "device": "Mobile",
+                    "url": "https://sbmob.isportgenius.com.au/ladder/10925825"
+                },
+                {
+                    "device": "Desktop",
+                    "url": "https://sblr-desktop.isportgenius.com.au/ladder/10925825"
+                },
+                {
+                    "device": "Mweb",
+                    "url": "https://sblr-mweb.isportgenius.com.au/ladder/10925825"
+                },
+                {
+                    "device": "iOSv2",
+                    "url": "https://sbios.isportgenius.com.au/ladder/10925825?v=iosv2"
+                }
+            ]
+        },
+        {
+            "funfacts": [
+                {
+                    "market_group_isgapi_id": "h2h",
+                    "fact": "Inter Milan has lost each of its last four Champions League Tuesday matches.",
+                    "tag": [
+                        "Inter Milan",
+                        "Club Brugge",
+                        "lost"
+                    ],
+                    "is_funfacts_tips": true,
+                    "target_bet": {
+                        "result": "Club Brugge",
+                        "market": "Win-Draw-Win",
+                        "market_id": "253583890",
+                        "outcomeid": "1252745580",
+                        "icon": "https://cdn.gtgnetwork.com/icons/teams/soccer/sportsbet/club_brugge.png",
+                        "price": 11.5,
+                        "price_american": "+1050",
+                        "market_isg_api_id": "loss",
+                        "market_key": "T1782-4002"
+                    },
+                    "fact_type": "preview"
+                },
+                {
+                    "market_group_isgapi_id": "total",
+                    "fact": "The 'Over 2.5 Goals' market has hit in each of Club Brugge's last 16 Champions League matches.",
+                    "tag": [
+                        "Inter Milan",
+                        "Club Brugge",
+                        "over"
+                    ],
+                    "target_bet": {
+                        "result": "Over 2.5 Goals",
+                        "market": "Over/Under 2.5 Goals",
+                        "market_id": "253583947",
+                        "outcomeid": "1252745944",
+                        "icon": "https://cdn.gtgnetwork.com/icons/sports/sportsbet/soccer_icon.png",
+                        "price": 1.39,
+                        "price_american": "-256",
+                        "total": 2.5,
+                        "market_isg_api_id": "over,2.5",
+                        "market_key": "0-6406"
+                    },
+                    "fact_type": "preview"
+                },
+                {
+                    "market_group_isgapi_id": "btts",
+                    "fact": "The 'Both Teams to Score' market has hit in each of Club Brugge's last six Champions League Tuesday matches.",
+                    "tag": [
+                        "Inter Milan",
+                        "Club Brugge",
+                        "bsts"
+                    ],
+                    "target_bet": {
+                        "result": "Yes",
+                        "market": "Both Teams To Score",
+                        "market_id": "253583905",
+                        "outcomeid": "1252745627",
+                        "icon": "https://cdn.gtgnetwork.com/icons/sports/sportsbet/soccer_icon.png",
+                        "price": 1.8,
+                        "price_american": "-125",
+                        "market_isg_api_id": "bsts-em",
+                        "market_key": "0-2002"
+                    },
+                    "fact_type": "preview"
+                }
+            ]
+        }
+    ]
+}

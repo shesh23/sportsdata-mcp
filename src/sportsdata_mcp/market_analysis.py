@@ -10,6 +10,7 @@ import argparse
 import json
 import math
 import sys
+import unicodedata
 from collections import Counter
 from datetime import UTC, date, datetime, timedelta, timezone, tzinfo
 from pathlib import Path
@@ -27,9 +28,48 @@ TOP_FIVE_LEAGUE_ALIASES = {
 }
 TOP_FIVE_LEAGUES = tuple(TOP_FIVE_LEAGUE_ALIASES)
 
+UEFA_COMPETITION_ALIASES = {
+    "UEFA Champions League": {"uefa champions league", "champions league", "ucl"},
+    "UEFA Europa League": {"uefa europa league", "europa league"},
+    "UEFA Conference League": {"uefa conference league", "conference league"},
+    "UEFA Super Cup": {"uefa super cup", "super cup"},
+}
 
-def select_top_five_competitions(payload: Any) -> list[dict[str, Any]]:
-    """Select only the five requested domestic leagues from Sportsbet's soccer navigation."""
+DOMESTIC_CUP_ALIASES = {
+    "English FA Cup": {"english fa cup", "fa cup"},
+    "English EFL Cup": {"english football league cup", "efl cup", "carabao cup", "english league cup"},
+    "FA Community Shield": {"fa community shield", "community shield"},
+    "Spanish Copa del Rey": {"spanish copa del rey", "copa del rey"},
+    "Spanish Supercopa de España": {"spanish supercopa de espana", "supercopa de espana", "spanish super cup"},
+    "German DFB-Pokal": {"german dfb pokal", "dfb pokal"},
+    "German DFL-Supercup": {"german dfl supercup", "dfl supercup", "german super cup"},
+    "Italian Coppa Italia": {"italian coppa italia", "coppa italia"},
+    "Italian Supercoppa Italiana": {"italian supercoppa italiana", "supercoppa italiana"},
+    "French Coupe de France": {"french coupe de france", "coupe de france"},
+    "French Trophée des Champions": {"french trophee des champions", "trophee des champions"},
+}
+
+TARGET_FOOTBALL_COMPETITION_ALIASES = {
+    **TOP_FIVE_LEAGUE_ALIASES,
+    **UEFA_COMPETITION_ALIASES,
+    **DOMESTIC_CUP_ALIASES,
+}
+TARGET_FOOTBALL_COMPETITIONS = tuple(TARGET_FOOTBALL_COMPETITION_ALIASES)
+
+
+def _normalise_competition_name(value: str) -> str:
+    """Fold accents and punctuation so official display-name variants match safely."""
+    decomposed = unicodedata.normalize("NFKD", value.casefold())
+    ascii_text = "".join(char for char in decomposed if not unicodedata.combining(char))
+    return " ".join("".join(char if char.isalnum() else " " for char in ascii_text).split())
+
+
+def _select_competitions(
+    payload: Any,
+    aliases_by_competition: dict[str, set[str]],
+    *,
+    output_key: str,
+) -> list[dict[str, Any]]:
     if not isinstance(payload, dict):
         raise TypeError("Expected a Sportsbet navigation object.")
 
@@ -37,6 +77,10 @@ def select_top_five_competitions(payload: Any) -> list[dict[str, Any]]:
     if not isinstance(roots, list):
         raise TypeError("Expected Sportsbet navigation items.")
 
+    normalised_aliases = {
+        canonical: {_normalise_competition_name(alias) for alias in aliases}
+        for canonical, aliases in aliases_by_competition.items()
+    }
     matches: dict[str, dict[str, Any]] = {}
 
     def visit(value: Any) -> None:
@@ -48,25 +92,22 @@ def select_top_five_competitions(payload: Any) -> list[dict[str, Any]]:
             return
 
         name = value.get("name")
-        if isinstance(name, str):
-            normalized_name = name.casefold().strip()
-            for league, aliases in TOP_FIVE_LEAGUE_ALIASES.items():
-                if normalized_name in aliases and (
-                    value.get("idType") == "competition" or "competitionId" in value
-                ):
-                    competition_id = (
-                        value.get("id") if value.get("idType") == "competition" else value.get("competitionId")
-                    )
-                    if competition_id is None:
-                        competition_id = value.get("id")
-                    if competition_id is not None:
-                        matches[league] = {
-                            "league": league,
-                            "competitionName": name,
-                            "competitionId": competition_id,
-                            "competitionExternalId": value.get("competitionExternalId"),
-                        }
-                    break
+        if isinstance(name, str) and (value.get("idType") == "competition" or "competitionId" in value):
+            normalized_name = _normalise_competition_name(name)
+            for canonical, aliases in normalised_aliases.items():
+                if normalized_name not in aliases:
+                    continue
+                competition_id = value.get("id") if value.get("idType") == "competition" else value.get("competitionId")
+                if competition_id is None:
+                    competition_id = value.get("competitionId", value.get("id"))
+                if competition_id is not None and canonical not in matches:
+                    matches[canonical] = {
+                        output_key: canonical,
+                        "competitionName": name,
+                        "competitionId": competition_id,
+                        "competitionExternalId": value.get("competitionExternalId"),
+                    }
+                break
 
         for key in ("navItems", "competitions"):
             if key in value:
@@ -77,7 +118,7 @@ def select_top_five_competitions(payload: Any) -> list[dict[str, Any]]:
         for node in roots
         if isinstance(node, dict)
         and isinstance(node.get("name"), str)
-        and node["name"].casefold().strip() in {"soccer", "football"}
+        and _normalise_competition_name(node["name"]) in {"soccer", "football"}
         and (node.get("idType") == "class" or "classId" in node or node.get("name") == "Soccer")
     ]
     if not soccer_roots:
@@ -85,7 +126,17 @@ def select_top_five_competitions(payload: Any) -> list[dict[str, Any]]:
     for soccer in soccer_roots:
         visit(soccer.get("navItems", soccer.get("competitions", [])))
 
-    return [matches[league] for league in TOP_FIVE_LEAGUES if league in matches]
+    return [matches[name] for name in aliases_by_competition if name in matches]
+
+
+def select_top_five_competitions(payload: Any) -> list[dict[str, Any]]:
+    """Select the five domestic leagues from Sportsbet's soccer navigation."""
+    return _select_competitions(payload, TOP_FIVE_LEAGUE_ALIASES, output_key="league")
+
+
+def select_target_football_competitions(payload: Any) -> list[dict[str, Any]]:
+    """Select requested top-five leagues, UEFA tournaments, and domestic cups."""
+    return _select_competitions(payload, TARGET_FOOTBALL_COMPETITION_ALIASES, output_key="competition")
 
 
 def decimal_implied_probability(decimal_odds: Any) -> float | None:
@@ -171,6 +222,29 @@ def snapshot_freshness(
         "maxAgeSeconds": max_age_seconds,
         "priceUpdatedAt": None,
         "note": "Freshness is measured from retrieval time; the provider response has no per-price update time.",
+    }
+
+
+def _scheduled_start_utc(value: Any) -> datetime | None:
+    if isinstance(value, bool):
+        return None
+    try:
+        return datetime.fromtimestamp(float(value), tz=UTC)
+    except (TypeError, ValueError, OverflowError, OSError):
+        return None
+
+
+def _retrieval_timing(retrieved_at: Any, scheduled_start: Any) -> dict[str, Any]:
+    retrieved = _parse_timestamp(retrieved_at)
+    scheduled = _scheduled_start_utc(scheduled_start)
+    if retrieved is None or scheduled is None:
+        return {"status": "unknown", "scheduledStartTime": scheduled.isoformat() if scheduled else None}
+    after_start = retrieved.astimezone(UTC) >= scheduled
+    return {
+        "status": "after-scheduled-kickoff" if after_start else "before-scheduled-kickoff",
+        "scheduledStartTime": scheduled.isoformat(),
+        "secondsFromScheduledKickoff": (retrieved.astimezone(UTC) - scheduled).total_seconds(),
+        "note": "No per-price update time is provided; post-kickoff snapshots may contain in-play or stale prices.",
     }
 
 
@@ -313,15 +387,47 @@ def analyse_snapshot_directory(
     if not manifest_path.is_file():
         raise ValueError(f"Snapshot directory has no manifest.json: {directory}")
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    event_status_by_id: dict[str, dict[str, Any]] = {}
+    for status_request in manifest.get("eventStatuses", []):
+        if status_request.get("httpStatus") != 200 or not status_request.get("rawFile"):
+            continue
+        status_path = directory / status_request["rawFile"]
+        try:
+            status_payload = json.loads(status_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        event_status_by_id[str(status_request.get("eventId"))] = {
+            "httpStatus": status_request.get("httpStatus"),
+            "retrievedAt": status_request.get("retrievedAt"),
+            "eventStatus": status_payload.get("eventStatus", status_payload.get("status")),
+            "inPlay": status_payload.get("inPlay"),
+            "suspended": status_payload.get("suspended"),
+        }
     events: list[dict[str, Any]] = []
     for request in manifest.get("events", []):
+        event_status = event_status_by_id.get(str(request.get("eventId")), {})
+        retrieval_timing = _retrieval_timing(
+            request.get("retrievedAt"), request.get("scheduledStartTime", request.get("startTime"))
+        )
         record: dict[str, Any] = {
             "eventId": request.get("eventId"),
+            "eventName": request.get("eventName"),
+            "competition": request.get("competition"),
             "endpoint": request.get("endpoint"),
             "httpStatus": request.get("httpStatus"),
             "retrievedAt": request.get("retrievedAt"),
             "rawFile": request.get("rawFile"),
+            "retrievalTiming": retrieval_timing,
+            "eventStatusHttpStatus": event_status.get("httpStatus"),
+            "eventStatusRetrievedAt": event_status.get("retrievedAt"),
+            "eventStatus": event_status.get("eventStatus"),
+            "inPlay": event_status.get("inPlay"),
+            "suspended": event_status.get("suspended"),
         }
+        record["eventStatusConflict"] = (
+            retrieval_timing["status"] == "after-scheduled-kickoff"
+            and str(event_status.get("eventStatus", "")).casefold() == "preview"
+        )
         if request.get("httpStatus") != 200 or not request.get("rawFile"):
             record["requestError"] = request.get("error") or "Market request did not return HTTP 200."
         else:
@@ -343,8 +449,8 @@ def analyse_snapshot_directory(
     return {
         "schemaVersion": 1,
         "provider": manifest.get("provider", "Sportsbet"),
-        "fixtureDate": manifest.get("fixtureDate"),
-        "fixtureTimezone": manifest.get("fixtureTimezone", "Australia/Brisbane"),
+        "fixtureDate": manifest.get("fixtureDate") or manifest.get("requestedLocalDate"),
+        "fixtureTimezone": manifest.get("fixtureTimezone") or manifest.get("timezone", "Australia/Brisbane"),
         "generatedAt": (now or datetime.now(UTC)).isoformat(),
         "maxSnapshotAgeSeconds": max_age_seconds,
         "events": events,
