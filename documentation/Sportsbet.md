@@ -1,7 +1,7 @@
 # Sportsbet API Documentation
 
-> For a read-only UEFA Champions League workflow using these public Sportsbet tools,
-> see [UEFA Champions League market analysis](#uefa-champions-league-market-analysis).
+> For a read-only workflow limited to the English Premier League, La Liga, Serie A,
+> Bundesliga, and Ligue 1, see [top-five league market analysis](#top-five-domestic-league-market-analysis).
 
 Unofficial reference for the JSON endpoints served under `www.sportsbet.com.au/apigw/*`. Every endpoint, parameter, and response field in this document has been verified against live traffic (probed 2026-05-25). Field shapes are reproduced from the wire — fields that were not observed are not invented.
 
@@ -2576,22 +2576,26 @@ Legs the book will not combine are refused rather than priced.
 
 ---
 
-### UEFA Champions League market analysis
+### Top-five domestic league market analysis
 
-This workflow uses only the existing public, read-only Sportsbet tools. It does not use
-the Sportsbet account or write groups. Do not enable `sportsbet.account` or
-`sportsbet.write`; do not call `sportsbet_place_bet`, `sportsbet_price_slip`, bet history,
-or any account, wallet, or placement operation.
+The scope is limited to association-football matches in the English Premier League,
+Spanish La Liga, Italian Serie A, German Bundesliga, and French Ligue 1. It excludes
+UEFA competitions, cups, lower divisions, women's leagues, and other sports. This
+workflow uses only existing public, read-only Sportsbet tools. It does not use the
+Sportsbet account or write groups. Do not enable `sportsbet.account` or `sportsbet.write`;
+do not call `sportsbet_place_bet`, `sportsbet_price_slip`, bet history, or any account,
+wallet, or placement operation.
 
 ### Read-only tool sequence
 
-1. Call `sportsbet_nav_hierarchy` and locate the `UEFA Champions League` competition
-   entry. Use the returned competition ID; do not hard-code an ID across seasons.
-2. Call `sportsbet_competition_matches` with that ID. Convert each event's Unix
-   `startTime` to `Australia/Brisbane`, then keep events whose local date is the target
-   date. Do not select a day from the European fixture label alone: a Tuesday evening
-   European kickoff can be a Wednesday Brisbane fixture.
-3. Call `sportsbet_event_markets` once for each matching event. Preserve the complete
+1. Call `sportsbet_nav_hierarchy` and select only the five domestic competitions under
+   the `Soccer` class. `select_top_five_competitions` recognizes the official names
+   returned by the current navigation and keeps the competition's internal `id` for
+   `sportsbet_competition_matches`. Do not hard-code competition IDs across seasons.
+2. Call `sportsbet_competition_matches` once for each selected competition. Convert each
+   event's Unix `startTime` to `Australia/Brisbane`, then keep events whose local date is
+   the target date. Do not infer the local date from a European calendar label alone.
+3. Call `sportsbet_event_markets` once for each confirmed matching event. Preserve the complete
    response, including market and selection `statusCode`, every selection, and every
    `price.winPrice` decimal quote. Record an aware retrieval timestamp immediately
    around each tool call, the endpoint/event ID, response status, and any error.
@@ -2607,6 +2611,17 @@ or any account, wallet, or placement operation.
 
 A single saved markets array can also be analysed with
 `--retrieved-at "2026-10-13T01:07:02+10:00"`.
+
+#### Fixture audit for 14 October 2026
+
+In the snapshot retrieved on 13 October 2026 from 02:01:51 to 02:01:52 AEST, the
+Sportsbet navigation and each of the five competition-match GET endpoints returned
+HTTP 200. The feeds returned no events whose kickoff instant fell on 14 October in
+`Australia/Brisbane`. Therefore no event-market request was made for that date: the
+snapshot contains zero retrieved markets and zero priced selections. This is an observed
+feed result, not an assumed fixture list or an inferred price. The raw navigation, five
+competition responses, and per-request UTC retrieval timestamps are preserved in the
+`sportsbet-top-five-2026-10-14-raw` run snapshot.
 
 The directory form expects `manifest.json` with an `events` array. A successful entry
 contains `eventId`, `endpoint`, `httpStatus: 200`, `retrievedAt`, and `rawFile`. Record
@@ -2650,8 +2665,16 @@ events and filters on the actual kickoff instant:
 
 ```python
 from sportsdata_mcp.market_analysis import filter_events_for_local_date
+from sportsdata_mcp.market_analysis import select_top_five_competitions
 
-matches = filter_events_for_local_date(matches_response, "2026-10-14")
+competitions = select_top_five_competitions(nav_hierarchy_response)
+matches = [
+    event
+    for competition in competitions
+    for event in filter_events_for_local_date(
+        competition_matches_by_id[competition["competitionId"]], "2026-10-14"
+    )
+]
 ```
 
 The default zone is `Australia/Brisbane`; on Windows without an installed IANA timezone
