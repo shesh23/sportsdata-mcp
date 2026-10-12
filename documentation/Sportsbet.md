@@ -1,5 +1,8 @@
 # Sportsbet API Documentation
 
+> For a read-only UEFA Champions League workflow using these public Sportsbet tools,
+> see [UEFA Champions League market analysis](#uefa-champions-league-market-analysis).
+
 Unofficial reference for the JSON endpoints served under `www.sportsbet.com.au/apigw/*`. Every endpoint, parameter, and response field in this document has been verified against live traffic (probed 2026-05-25). Field shapes are reproduced from the wire — fields that were not observed are not invented.
 
 > **Base URL:** `https://www.sportsbet.com.au/apigw`
@@ -2570,3 +2573,86 @@ Both observed live, both HTTP 400:
 | `ERR-VE` | body failed schema validation, usually an `id` where an `externalId` belongs |
 
 Legs the book will not combine are refused rather than priced.
+
+---
+
+### UEFA Champions League market analysis
+
+This workflow uses only the existing public, read-only Sportsbet tools. It does not use
+the Sportsbet account or write groups. Do not enable `sportsbet.account` or
+`sportsbet.write`; do not call `sportsbet_place_bet`, `sportsbet_price_slip`, bet history,
+or any account, wallet, or placement operation.
+
+### Read-only tool sequence
+
+1. Call `sportsbet_nav_hierarchy` and locate the `UEFA Champions League` competition
+   entry. Use the returned competition ID; do not hard-code an ID across seasons.
+2. Call `sportsbet_competition_matches` with that ID. Convert each event's Unix
+   `startTime` to `Australia/Brisbane`, then keep events whose local date is the target
+   date. Do not select a day from the European fixture label alone: a Tuesday evening
+   European kickoff can be a Wednesday Brisbane fixture.
+3. Call `sportsbet_event_markets` once for each matching event. Preserve the complete
+   response, including market and selection `statusCode`, every selection, and every
+   `price.winPrice` decimal quote. Record an aware retrieval timestamp immediately
+   around each tool call, the endpoint/event ID, response status, and any error.
+4. Call `sportsbet_event_status` for each event if a live/suspended/settled event-level
+   flag is needed. Market and selection status still come from the markets response.
+5. Run the offline analyser on the saved response files. The analyser does not access
+   the network or alter the raw files:
+
+   ```bash
+   python -m sportsdata_mcp.market_analysis path/to/snapshot-directory \
+     --max-age-minutes 15 --output market-analysis.json
+   ```
+
+A single saved markets array can also be analysed with
+`--retrieved-at "2026-10-13T01:07:02+10:00"`.
+
+The directory form expects `manifest.json` with an `events` array. A successful entry
+contains `eventId`, `endpoint`, `httpStatus: 200`, `retrievedAt`, and `rawFile`. Record
+failed HTTP calls in the same array with their status/error and no raw file. The analyser
+retains these failures in its report rather than silently omitting the event.
+
+### Counts, prices, and freshness
+
+The report separates total selections with a valid decimal price from active priced
+selections, suspended priced selections, and selections with a missing/invalid price.
+It also gives market and selection status counts. A suspended selection can still have a
+price field; that number is retained as returned but is not described as active.
+
+For each valid decimal quote `d`, raw implied probability is `1 / d`. The analyser only
+removes overround for a complete, active Sportsbet `Win-Draw-Win` market containing one
+each of result types `H`, `D`, and `A`. It proportionally divides each raw probability by
+their sum and reports that sum and the overround. It does not normalize totals, handicaps,
+player props, incomplete markets, or suspended outcomes as if they were mutually
+exclusive and exhaustive.
+
+Snapshot age is measured from the recorded retrieval timestamp. The Sportsbet event
+markets payload does not expose an individual price-update timestamp, so the report keeps
+`priceUpdatedAt: null`. “Fresh” therefore means only that this saved response was fetched
+within the configured age limit; it cannot prove the bookmaker changed each quote at
+that moment. Mark freshness unknown when the timestamp is missing, invalid, or in the
+future. Keep the raw response and timestamp so later readers can see what was actually
+returned.
+
+### Independent comparisons
+
+Record the source URL, publication/retrieval time, timezone, and market definition for
+every comparison. Compare equivalent 1X2 outcomes only. An independent model forecast is
+not a bookmaker price; a bookmaker price is not a team statistic. Keep those comparisons
+separate and flag sources that do not state their quote timestamp. Do not fill gaps by
+estimating odds, forecasts, kickoff times, or unavailable statistics.
+
+### Fixture-date filter helper
+
+For grouped `sportsbet_competition_matches` responses, the library helper below flattens
+events and filters on the actual kickoff instant:
+
+```python
+from sportsdata_mcp.market_analysis import filter_events_for_local_date
+
+matches = filter_events_for_local_date(matches_response, "2026-10-14")
+```
+
+The default zone is `Australia/Brisbane`; on Windows without an installed IANA timezone
+database the helper uses AEST (UTC+10), which is fixed year-round in Brisbane.
