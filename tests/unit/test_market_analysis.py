@@ -6,10 +6,12 @@ from datetime import UTC, datetime
 import pytest
 
 from sportsdata_mcp.market_analysis import (
+    TOP_FIVE_LEAGUES,
     analyse_markets,
     analyse_snapshot_directory,
     decimal_implied_probability,
     filter_events_for_local_date,
+    select_top_five_competitions,
     snapshot_freshness,
 )
 from sportsdata_mcp.spec_loader import load_all_specs
@@ -103,6 +105,101 @@ def test_fixture_filter_uses_brisbane_local_date_from_the_event_instant():
     ]
     grouped = [{"groupName": "Match Betting", "events": events}]
     assert [event["id"] for event in filter_events_for_local_date(grouped, "2026-10-14")] == [1, 2]
+
+
+def test_top_five_competition_selection_uses_soccer_nodes_and_internal_ids_only():
+    nav = {
+        "idType": "CONST",
+        "navItems": [
+            {
+                "idType": "class",
+                "name": "Soccer",
+                "navItems": [
+                    {
+                        "name": "UEFA Competitions",
+                        "navItems": [
+                            {"idType": "competition", "id": 10, "name": "UEFA Champions League"}
+                        ],
+                    },
+                    {
+                        "name": "United Kingdom",
+                        "navItems": [
+                            {
+                                "idType": "competition",
+                                "id": 718,
+                                "competitionExternalId": "289",
+                                "name": "English Premier League",
+                            },
+                            {"idType": "competition", "id": 719, "name": "English Championship"},
+                        ],
+                    },
+                    {
+                        "name": "Spain",
+                        "navItems": [
+                            {"idType": "competition", "id": 1029, "name": "Spanish La Liga"}
+                        ],
+                    },
+                    {
+                        "name": "Italy",
+                        "navItems": [
+                            {"idType": "competition", "id": 1015, "name": "Italian Serie A"}
+                        ],
+                    },
+                    {
+                        "name": "Germany",
+                        "navItems": [
+                            {"idType": "competition", "id": 739, "name": "German Bundesliga"}
+                        ],
+                    },
+                    {
+                        "name": "France",
+                        "navItems": [
+                            {"idType": "competition", "id": 876, "name": "French Ligue 1"}
+                        ],
+                    },
+                ],
+            },
+            {
+                "idType": "class",
+                "name": "Basketball",
+                "navItems": [
+                    {"idType": "competition", "id": 999, "name": "Italian Serie A"}
+                ],
+            },
+        ],
+    }
+
+    competitions = select_top_five_competitions(nav)
+
+    assert tuple(row["league"] for row in competitions) == TOP_FIVE_LEAGUES
+    assert [row["competitionId"] for row in competitions] == [718, 1029, 1015, 739, 876]
+    assert competitions[0]["competitionExternalId"] == "289"
+
+
+def test_top_five_competition_selection_supports_competition_id_shape():
+    nav = {
+        "nav": [
+            {
+                "name": "Soccer",
+                "competitions": [
+                    {"competitionId": "77", "name": "LaLiga EA Sports"},
+                    {"competitionId": "78", "name": "Ligue 1 McDonald's"},
+                ],
+            }
+        ]
+    }
+
+    competitions = select_top_five_competitions(nav)
+
+    assert [(row["league"], row["competitionId"]) for row in competitions] == [
+        ("Spanish La Liga", "77"),
+        ("French Ligue 1", "78"),
+    ]
+
+
+def test_top_five_competition_selection_requires_a_soccer_navigation_node():
+    with pytest.raises(ValueError, match="Soccer/Football class"):
+        select_top_five_competitions({"navItems": [{"name": "Basketball", "navItems": []}]})
 
 
 def test_documented_sportsbet_workflow_contains_only_anonymous_get_tools():

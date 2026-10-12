@@ -18,6 +18,74 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 _SUPPORTED_NO_VIG_MARKET = "Win-Draw-Win"
 _ONE_X_TWO_RESULTS = {"H", "D", "A"}
+TOP_FIVE_LEAGUE_ALIASES = {
+    "English Premier League": {"english premier league", "premier league", "epl"},
+    "Spanish La Liga": {"spanish la liga", "la liga", "laliga", "laliga ea sports"},
+    "Italian Serie A": {"italian serie a", "serie a", "serie a enilive"},
+    "German Bundesliga": {"german bundesliga", "bundesliga"},
+    "French Ligue 1": {"french ligue 1", "ligue 1", "ligue 1 mcdonald's"},
+}
+TOP_FIVE_LEAGUES = tuple(TOP_FIVE_LEAGUE_ALIASES)
+
+
+def select_top_five_competitions(payload: Any) -> list[dict[str, Any]]:
+    """Select only the five requested domestic leagues from Sportsbet's soccer navigation."""
+    if not isinstance(payload, dict):
+        raise TypeError("Expected a Sportsbet navigation object.")
+
+    roots = payload.get("navItems", payload.get("nav"))
+    if not isinstance(roots, list):
+        raise TypeError("Expected Sportsbet navigation items.")
+
+    matches: dict[str, dict[str, Any]] = {}
+
+    def visit(value: Any) -> None:
+        if isinstance(value, list):
+            for child in value:
+                visit(child)
+            return
+        if not isinstance(value, dict):
+            return
+
+        name = value.get("name")
+        if isinstance(name, str):
+            normalized_name = name.casefold().strip()
+            for league, aliases in TOP_FIVE_LEAGUE_ALIASES.items():
+                if normalized_name in aliases and (
+                    value.get("idType") == "competition" or "competitionId" in value
+                ):
+                    competition_id = (
+                        value.get("id") if value.get("idType") == "competition" else value.get("competitionId")
+                    )
+                    if competition_id is None:
+                        competition_id = value.get("id")
+                    if competition_id is not None:
+                        matches[league] = {
+                            "league": league,
+                            "competitionName": name,
+                            "competitionId": competition_id,
+                            "competitionExternalId": value.get("competitionExternalId"),
+                        }
+                    break
+
+        for key in ("navItems", "competitions"):
+            if key in value:
+                visit(value[key])
+
+    soccer_roots = [
+        node
+        for node in roots
+        if isinstance(node, dict)
+        and isinstance(node.get("name"), str)
+        and node["name"].casefold().strip() in {"soccer", "football"}
+        and (node.get("idType") == "class" or "classId" in node or node.get("name") == "Soccer")
+    ]
+    if not soccer_roots:
+        raise ValueError("Sportsbet navigation did not contain a Soccer/Football class.")
+    for soccer in soccer_roots:
+        visit(soccer.get("navItems", soccer.get("competitions", [])))
+
+    return [matches[league] for league in TOP_FIVE_LEAGUES if league in matches]
 
 
 def decimal_implied_probability(decimal_odds: Any) -> float | None:
