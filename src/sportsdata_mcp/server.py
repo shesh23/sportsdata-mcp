@@ -18,9 +18,14 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Annotated, Literal, cast
 
+import fastmcp
 from fastmcp import FastMCP
 from mcp.types import ToolAnnotations
 from pydantic import Field
+from starlette.middleware import Middleware
+from starlette.requests import Request
+from starlette.responses import FileResponse, RedirectResponse, Response
+from starlette.types import ASGIApp, Receive, Scope, Send
 
 from . import __version__, telemetry
 from .config import Config, load_config
@@ -32,6 +37,45 @@ from .spec import Dispatcher, Endpoint, Spec
 from .spec_loader import expand_wildcard_groups, load_all_specs, load_capabilities
 
 log = logging.getLogger("sportsdata_mcp.server")
+
+
+def _is_browser_mcp_navigation(
+    method: str, path: str, accept: str, endpoint_path: str
+) -> bool:
+    """Return whether a request is a browser navigation rather than an MCP stream request."""
+    return (
+        method == "GET"
+        and path == endpoint_path
+        and "text/event-stream" not in accept.casefold()
+    )
+
+
+class _BrowserMcpRedirectMiddleware:
+    """Send ordinary browser navigations from the MCP endpoint to the local audit UI."""
+
+    def __init__(self, app: ASGIApp, *, endpoint_path: str, destination: str) -> None:
+        self.app = app
+        self.endpoint_path = endpoint_path
+        self.destination = destination
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
+        headers = {
+            key.decode("latin-1").casefold(): value.decode("latin-1")
+            for key, value in scope["headers"]
+        }
+        accept = headers.get("accept", "").casefold()
+        if _is_browser_mcp_navigation(
+            scope["method"], scope["path"], accept, self.endpoint_path
+        ):
+            response = RedirectResponse(self.destination, status_code=302)
+            await response(scope, receive, send)
+            return
+
+        await self.app(scope, receive, send)
 
 
 # ─── Capability index (richer than spec_loader's, for the meta-tool) ────
@@ -388,6 +432,49 @@ def serve_http(
         raise ValueError(
             f"unsupported transport {transport!r} — expected one of {', '.join(HTTP_TRANSPORTS)}"
         )
+
+    audit_root = (
+        Path(__file__).resolve().parents[2]
+        / "data/audits/sportsbet-all-football-2026-10-14-rerun"
+    )
+    dashboard_path = (
+        Path(__file__).resolve().parents[2]
+        / "documentation/audits/sportsbet-all-football-2026-10-14.html"
+    )
+    audit_data_path = audit_root / "market-analysis.json"
+    local_host = host in ("127.0.0.1", "::1", "localhost")
+    middleware = None
+    if local_host and dashboard_path.is_file() and audit_data_path.is_file():
+
+        @mcp.custom_route("/sportsbet-audit", methods=["GET"], include_in_schema=False)
+        async def sportsbet_audit_page(_request: Request) -> Response:
+            return FileResponse(
+                dashboard_path,
+                media_type="text/html",
+                headers={"Cache-Control": "no-store"},
+            )
+
+        @mcp.custom_route("/sportsbet-audit/data.json", methods=["GET"], include_in_schema=False)
+        async def sportsbet_audit_data(_request: Request) -> Response:
+            return FileResponse(
+                audit_data_path,
+                media_type="application/json",
+                headers={"Cache-Control": "no-store"},
+            )
+
+        endpoint_path = (
+            fastmcp.settings.sse_path
+            if transport == "sse"
+            else fastmcp.settings.streamable_http_path
+        )
+        middleware = [
+            Middleware(
+                _BrowserMcpRedirectMiddleware,
+                endpoint_path=endpoint_path,
+                destination="/sportsbet-audit",
+            )
+        ]
+
     log.info("serving MCP over %s at http://%s:%s/mcp", transport, host, port)
     # The check above is what makes this narrowing sound.
-    mcp.run(transport=cast(HTTPTransport, transport), host=host, port=port)
+    mcp.run(transport=cast(HTTPTransport, transport), host=host, port=port, middleware=middleware)

@@ -2639,6 +2639,17 @@ limits are in the [expanded run audit](audits/sportsbet-all-football-2026-10-14.
 Raw responses and the request manifest are preserved under
 [`sportsbet-all-football-2026-10-14-rerun`](../data/audits/sportsbet-all-football-2026-10-14-rerun/).
 
+#### Open the saved audit in a browser
+
+When running the source checkout's HTTP server on loopback with this audit snapshot
+present, open `http://127.0.0.1:3000/sportsbet-audit` for a searchable view of the saved
+markets, selections, decimal odds, statuses, and calculated probabilities. A plain browser
+navigation to `/mcp` redirects to this page so it does not display the MCP protocol error
+that requires `Accept: text/event-stream`. MCP clients that send the expected protocol
+headers continue to use `/mcp` normally. The browser view reads the committed JSON snapshot
+only: it does not refresh Sportsbet prices or enable any betting operation. The displayed
+odds are therefore historical and stale, as described above.
+
 All nine market snapshots were retrieved on 12 October UTC, before their scheduled
 13 October UTC kick-offs (14 October in Brisbane), and each event-status response said
 `preview`. The analyser records whether each market request was before or after the
