@@ -2621,7 +2621,7 @@ HTTP 200. The feeds returned no events whose kickoff instant fell on 14 October 
 snapshot contains zero retrieved markets and zero priced selections. This is an observed
 feed result, not an assumed fixture list or an inferred price. The raw navigation, five
 competition responses, and per-request UTC retrieval timestamps are preserved in the
-`sportsbet-top-five-2026-10-14-raw` run snapshot.
+[`sportsbet-top-five-2026-10-14-raw`](../data/audits/sportsbet-top-five-2026-10-14-raw/) run snapshot, with the [audit report](audits/sportsbet-top-five-2026-10-14.md).
 
 The directory form expects `manifest.json` with an `events` array. A successful entry
 contains `eventId`, `endpoint`, `httpStatus: 200`, `retrievedAt`, and `rawFile`. Record
